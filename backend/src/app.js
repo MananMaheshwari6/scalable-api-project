@@ -2,6 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const Task = require('./models/Task');
+const User = require('./models/user.model');
+const authRoutes = require('./routes/auth.routes');
+const { protect } = require('./middleware/auth.middleware');
+const { authorize } = require('./middleware/role.middleware');
 
 const app = express();
 
@@ -18,6 +22,9 @@ app.get('/api/v1/health', (req, res) => {
   });
 });
 
+// Auth Routes
+app.use('/api/v1/auth', authRoutes);
+
 //used to validate an object 
 const validateObjectId = (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -29,8 +36,8 @@ const validateObjectId = (req, res, next) => {
   next();
 };
 
-// Get all tasks 
-app.get('/api/v1/tasks', async (req, res, next) => {
+// Get all tasks (Protected)
+app.get('/api/v1/tasks', protect, async (req, res, next) => {
   try {
     const tasks = await Task.find().sort({ createdAt: -1 });
     res.status(200).json({
@@ -43,8 +50,8 @@ app.get('/api/v1/tasks', async (req, res, next) => {
   }
 });
 
-// Get single task
-app.get('/api/v1/tasks/:id', validateObjectId, async (req, res, next) => {
+// Get single task (Protected)
+app.get('/api/v1/tasks/:id', protect, validateObjectId, async (req, res, next) => {
   try {
     const task = await Task.findById(req.params.id);
 
@@ -64,8 +71,8 @@ app.get('/api/v1/tasks/:id', validateObjectId, async (req, res, next) => {
   }
 });
 
-// Create task
-app.post('/api/v1/tasks', async (req, res, next) => {
+// Create task (Protected)
+app.post('/api/v1/tasks', protect, async (req, res, next) => {
   try {
     const { title, description, completed } = req.body;
 
@@ -97,8 +104,8 @@ app.post('/api/v1/tasks', async (req, res, next) => {
   }
 });
 
-// Update task
-app.put('/api/v1/tasks/:id', validateObjectId, async (req, res, next) => {
+// Update task (Protected)
+app.put('/api/v1/tasks/:id', protect, validateObjectId, async (req, res, next) => {
   try {
     const task = await Task.findByIdAndUpdate(
       req.params.id,
@@ -122,8 +129,8 @@ app.put('/api/v1/tasks/:id', validateObjectId, async (req, res, next) => {
   }
 });
 
-// Delete task
-app.delete('/api/v1/tasks/:id', validateObjectId, async (req, res, next) => {
+// Delete task (Admin only)
+app.delete('/api/v1/tasks/:id', protect, authorize('admin'), validateObjectId, async (req, res, next) => {
   try {
     const task = await Task.findByIdAndDelete(req.params.id);
 
@@ -137,6 +144,42 @@ app.delete('/api/v1/tasks/:id', validateObjectId, async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: 'Task deleted successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Admin Routes
+// Get all users (Admin only)
+app.get('/api/v1/admin/users', protect, authorize('admin'), async (req, res, next) => {
+  try {
+    const users = await User.find().select('-password').sort({ createdAt: -1 });
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      data: users
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get single user (Admin only)
+app.get('/api/v1/admin/users/:id', protect, authorize('admin'), validateObjectId, async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: user
     });
   } catch (error) {
     next(error);
