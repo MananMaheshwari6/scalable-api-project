@@ -39,7 +39,13 @@ const validateObjectId = (req, res, next) => {
 // Get all tasks (Protected)
 app.get('/api/v1/tasks', protect, async (req, res, next) => {
   try {
-    const tasks = await Task.find().sort({ createdAt: -1 });
+    let query = {};
+    
+    if (req.user.role !== 'admin') {
+      query.user = req.user.id;
+    }
+    
+    const tasks = await Task.find(query).sort({ createdAt: -1 });
     res.status(200).json({
       success: true,
       count: tasks.length,
@@ -59,6 +65,13 @@ app.get('/api/v1/tasks/:id', protect, validateObjectId, async (req, res, next) =
       return res.status(404).json({
         success: false,
         error: 'Task not found'
+      });
+    }
+
+    if (req.user.role !== 'admin' && task.user.toString() !== req.user.id.toString()) {
+      return res.status(403).json({
+        success: false,
+        error: 'Not authorized to access this task'
       });
     }
 
@@ -86,7 +99,8 @@ app.post('/api/v1/tasks', protect, async (req, res, next) => {
     const task = await Task.create({
       title,
       description: description || '',
-      completed: completed || false
+      completed: completed || false,
+      user: req.user.id
     });
 
     res.status(201).json({
@@ -107,11 +121,7 @@ app.post('/api/v1/tasks', protect, async (req, res, next) => {
 // Update task (Protected)
 app.put('/api/v1/tasks/:id', protect, validateObjectId, async (req, res, next) => {
   try {
-    const task = await Task.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
+    const task = await Task.findById(req.params.id);
 
     if (!task) {
       return res.status(404).json({
@@ -120,19 +130,32 @@ app.put('/api/v1/tasks/:id', protect, validateObjectId, async (req, res, next) =
       });
     }
 
+    if (req.user.role !== 'admin' && task.user.toString() !== req.user.id.toString()) {
+      return res.status(403).json({
+        success: false,
+        error: 'Not authorized to update this task'
+      });
+    }
+
+    const updatedTask = await Task.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
     res.status(200).json({
       success: true,
-      data: task
+      data: updatedTask
     });
   } catch (error) {
     next(error);
   }
 });
 
-// Delete task (Admin only)
-app.delete('/api/v1/tasks/:id', protect, authorize('admin'), validateObjectId, async (req, res, next) => {
+// Delete task (Owner or Admin)
+app.delete('/api/v1/tasks/:id', protect, validateObjectId, async (req, res, next) => {
   try {
-    const task = await Task.findByIdAndDelete(req.params.id);
+    const task = await Task.findById(req.params.id);
 
     if (!task) {
       return res.status(404).json({
@@ -140,6 +163,15 @@ app.delete('/api/v1/tasks/:id', protect, authorize('admin'), validateObjectId, a
         error: 'Task not found'
       });
     }
+
+    if (req.user.role !== 'admin' && task.user.toString() !== req.user.id.toString()) {
+      return res.status(403).json({
+        success: false,
+        error: 'Not authorized to delete this task'
+      });
+    }
+
+    await Task.findByIdAndDelete(req.params.id);
 
     res.status(200).json({
       success: true,
