@@ -1,3 +1,16 @@
+# 🌐 Live Demo
+#### 🔗 Frontend (Netlify)
+
+#### https://neon-kataifi-523045.netlify.app/login
+
+#### 🔗 Backend API (Render)
+
+#### https://scalable-api-project.onrender.com/api/v1/health
+
+⚠️ Note:
+The backend is hosted on Render’s free tier.
+Free instances spin down when inactive and may take 30–60 seconds to start up again.
+So the first request may be slow, after that everything works smoothly.
 # 🚀 Scalable REST API with Authentication, RBAC & Task Management
 
 This project implements a secure and scalable backend system with:
