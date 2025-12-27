@@ -3,13 +3,14 @@
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 200px);
+  background-color: #EBF4DD;
 }
 
 .page-content {
-  background-color: #fff;
+  background-color: #FFFFFF;
   padding: 3rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(59, 73, 83, 0.1);
   max-width: 600px;
   width: 100%;
   text-align: center;
@@ -18,12 +19,13 @@
 .page-content h1 {
   font-size: 2rem;
   margin-bottom: 1rem;
-  color: #333;
+  color: #3B4953;
 }
 
 .page-content p {
   font-size: 1rem;
-  color: #666;
+  color: #3B4953;
   line-height: 1.6;
+  opacity: 0.8;
 }
 
