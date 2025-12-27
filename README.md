@@ -1,93 +1,68 @@
-🚀 Scalable REST API with Authentication, RBAC & Task Management
+# 🚀 Scalable REST API with Authentication, RBAC & Task Management
 
-This project implements a secure, scalable backend system with:
+This project implements a secure and scalable backend system with:
 
-User Authentication (JWT)
+- JWT Authentication  
+- Role-Based Authorization (User & Admin)  
+- Task CRUD APIs with Ownership Enforcement  
+- API Versioning, Validation & Error Handling  
+- Supporting Frontend UI for interaction  
 
-Role-Based Authorization (User & Admin)
+Developed as part of a **Backend Developer Intern Assignment**.
 
-Task CRUD APIs with Ownership Enforcement
+---
 
-API Versioning, Validation & Error Handling
+## ✅ Features
 
-Supporting frontend UI for interaction
+### 🔐 Authentication
+- User Registration and Login
+- Password hashing using bcrypt
+- JWT authentication
+- Protected routes
 
-Designed as part of a Backend Developer Intern Assignment.
+### 🛡️ Authorization (RBAC)
+- Roles: `user`, `admin`
+- Admin-only protected routes
+- Users can only access their own tasks
+- Admins can access everything
 
-✅ Features
-🔐 Authentication
+### 🗂️ Task Management
+- Create Task
+- Get Tasks
+- Get Task by ID
+- Update Task
+- Delete Task (Admin Only)
+- Each task is linked to a user
 
-Register & Login
+### ⚙️ Core System Features
+- MongoDB database
+- API Versioning (`/api/v1`)
+- Centralized Error Handling
+- Data Validation
+- Clean and scalable folder structure
 
-Password hashing using bcrypt
+---
 
-JWT Authentication
+## 🏗️ Tech Stack
 
-Protected routes
+### Backend
+- Node.js  
+- Express.js  
+- MongoDB + Mongoose  
+- JWT  
+- Bcrypt  
+- CORS  
 
-🛡️ Authorization (RBAC)
+### Frontend (Support UI)
+- React + Vite  
+- Protected Routes  
+- UI for Authentication & Tasks  
 
-Roles: user, admin
+---
 
-Admin-only protected routes
+## 📂 Project Structure
 
-Users can only access their own tasks
-
-Admins can access everything
-
-🗂️ Task Management
-
-Create Task
-
-Get Tasks
-
-Get Task by ID
-
-Update Task
-
-Delete Task (Admin Only)
-
-Each task is linked to a user
-
-⚙️ Core System Features
-
-MongoDB database
-
-API Versioning (/api/v1)
-
-Centralized Error Handling
-
-Data Validation
-
-Clean folder structure
-
-Scalable & production-ready architecture
-
-🏗️ Tech Stack
-
-Backend
-
-Node.js
-
-Express.js
-
-MongoDB + Mongoose
-
-JWT
-
-Bcrypt
-
-CORS
-
-Frontend (Support UI)
-
-React + Vite
-
-Protected Routes
-
-UI for Authentication & Tasks
-
-📂 Project Structure
+```bash
 backend/
  ├─ src/
  │   ├─ controllers/
@@ -100,194 +75,160 @@ backend/
  ├─ README.md
  ├─ .env (ignored)
  └─ Docker files
+```
+## ⚙️ Setup & Run Locally
 
-⚙️ Setup & Run Locally
-1️⃣ Clone Repository
-git clone <repo-url>
+### 1️⃣ Clone Repository
+```bash
+git clone https://github.com/MananMaheshwari6/scalable-api-project
 cd backend
 npm install
+```
 
-2️⃣ Configure Environment
+### 2️⃣ Configure Environment
 
-Create .env in root of backend:
-
+Create .env in backend root:
+```bash
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/scalable-api
 JWT_SECRET=supersecretkey
 JWT_EXPIRE=30d
 NODE_ENV=development
+```
+#### 3️⃣ Start Server
+```
+node server.js
+```
+#### Health Check:
 
+    GET /api/v1/health
 
-If deploying, replace Mongo URI with MongoDB Atlas.
-
-3️⃣ Start Server
-npm start
-
-
-Default server runs on:
-
-http://localhost:5000
-
-
-Health Check:
-
-GET /api/v1/health
-
-🔑 Authentication API
-Register
+### 🔑 Authentication API
+#### 🔹 Register
+```
 POST /api/v1/auth/register
-
-
-Body:
-
+```
+```
+Request Body
 {
   "name": "John",
   "email": "john@mail.com",
   "password": "123456",
   "role": "user"
 }
-
-Login
+```
+#### 🔹 Login
+```
 POST /api/v1/auth/login
+```
 
+Returns JWT token.
 
-Returns JWT Token
+#### 🔹 Get Current User
+    GET /api/v1/auth/me
 
-Get Current User
+-    Header Authorization: Bearer <token>
 
-Protected
+### 📝 Tasks API
+#### 🔹 Get Tasks
 
-GET /api/v1/auth/me
-
-
-Header:
-
-Authorization: Bearer <token>
-
-📝 Tasks API
-Get Tasks (User gets own tasks / Admin gets all)
+- User gets own tasks / Admin gets all tasks
+```
 GET /api/v1/tasks
+```
+#### 🔹 Get Single Task
+    GET /api/v1/tasks/:id
 
-Get Single Task
-GET /api/v1/tasks/:id
+#### 🔹 Create Task
+    POST /api/v1/tasks
 
-Create Task
-POST /api/v1/tasks
-
-
-Body:
-
+```
+Body
 {
   "title": "My Task",
   "description": "Task Details"
 }
+```
+#### 🔹 Update Task
+    PUT /api/v1/tasks/:id
 
-Update Task
-PUT /api/v1/tasks/:id
+#### 🔹 Delete Task (Admin Only)
+    DELETE /api/v1/tasks/:id
 
-Delete Task
+### 🛡️ Role Permissions
+| Feature          | User | Admin |
+| ---------------- | ---- | ----- |
+| Register/Login   | ✔️   | ✔️    |
+| View Own Tasks   | ✔️   | ✔️    |
+| Create Tasks     | ✔️   | ✔️    |
+| Update Own Tasks | ✔️   | ✔️    |
+| Delete Tasks     | ❌    | ✔️    |
+| View All Users   | ❌    | ✔️    |
 
-(Admin Only)
+### 📄 API Documentation
 
-DELETE /api/v1/tasks/:id
+A Postman collection is included for easy testing.
 
-| Feature         | User | Admin |
-| --------------- | ---- | ----- |
-| Register/Login  | ✔️   | ✔️    |
-| View Own Tasks  | ✔️   | ✔️    |
-| Create Task     | ✔️   | ✔️    |
-| Update Own Task | ✔️   | ✔️    |
-| Delete Task     | ❌    | ✔️    |
-| View All Users  | ❌    | ✔️    |
+- postman_collection.json
 
-
-Ownership rules:
-
-Users can only access their own tasks
-
-Admin can access all tasks
-
-📄 API Documentation
-
-A full Postman Collection is included for easy testing.
-
-File:
-
-postman_collection.json
-
-
-Import → Test → Done ✅
-
-🐳 Docker Ready
-
-Docker configuration files are included to support containerized deployment.
+### 🐳 Docker Ready
 
 Includes:
+- Dockerfile  
+- docker-compose.yml  
+- .dockerignore  
 
-Dockerfile
+Prepared for containerized deployment.
 
-.dockerignore
+---
 
-docker-compose.yml
+### 📈 Scalability & Security
 
-Prepares backend for deployment in container environments.
+#### 🧩 Scalability
+- Horizontal scaling (multiple Node instances)
+- Load balancing (NGINX)
+- Docker containerization
+- Cloud hosting ready (AWS / Render / Railway)
+- MongoDB Atlas support
+- Redis caching (future enhancement)
+- Modular structure → microservice-ready
 
-📈 Scalability & Security Notes
-🧩 Scalability
+---
 
-The architecture supports scaling using:
+### 🔐 Security
+- Bcrypt password hashing
+- JWT authentication with expiry
+- Protected routes middleware
+- Role-Based Access Control (RBAC)
+- Centralized error handler
+- Secure environment variables
 
-Horizontal Scaling (Multiple Node Instances)
+---
 
-Load Balancing (NGINX)
+### 🎯 Frontend Support UI
 
-Docker Containerization
+Frontend provides:
+- Register
+- Login
+- Dashboard
+- Tasks CRUD
+- Protected UI flows
 
-Cloud Hosting (AWS / Render / Railway)
+---
 
-MongoDB Atlas (Cloud Database)
+## ✅ Assignment Checklist
 
-Redis Caching (Optional Future Improvement)
+| Requirement | Status |
+|------------|--------|
+Backend Hosted on GitHub | ✔️
+REST API with Auth | ✔️
+RBAC Implemented | ✔️
+CRUD Entity | ✔️
+API Versioning | ✔️
+Validation & Error Handling | ✔️
+Postman Docs | ✔️
+Frontend UI | ✔️
+Docker Support | ✔️
+Scalability Note | ✔️
 
-Modular Code Ready for Microservices
 
-🔐 Security
-
-Passwords hashed (bcrypt)
-
-JWT-based authentication with expiry
-
-Protected API endpoints
-
-Role-based authorization
-
-Centralized error handler
-
-Environment-based secrets
-
-🎯 Frontend Support UI
-
-A frontend is provided to:
-
-Register Users
-
-Login
-
-Display Dashboard
-
-Manage Tasks (CRUD)
-
-Handle protected UI flows
-
-✅ Assignment Checklist
-Requirement	Status
-Backend Hosted on GitHub	✔️
-REST API with Auth	✔️
-Role-Based Access	✔️
-CRUD Entity Implemented	✔️
-API Versioning	✔️
-Validation & Error Handling	✔️
-Postman Docs	✔️
-Frontend UI	✔️
-Docker Support	✔️
-Scalability Note	✔️
